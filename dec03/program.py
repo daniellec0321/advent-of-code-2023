@@ -21,6 +21,9 @@ def get_digits(line: str) -> dict: # Key: index in the line, value: the number
 
     return ret
 
+def find_nums(line: str, index: int) -> list: # given a line and index, returns the index of where that number starts and the number
+    return [(-1,-1), '']
+
 
 
 if __name__ == '__main__':
@@ -83,13 +86,9 @@ if __name__ == '__main__':
         occs = [i for i, letter in enumerate(line) if letter == '*']
         for occ in occs:
             # Check to make sure there are exactly two numbers
-            line1 = grid[col-1][occ-1:occ+2]
-            line2 = grid[col][occ-1:occ+2]
-            line3 = grid[col+1][occ-1:occ+2]
-            print(f'for * at index ({col}, {occ}), the lines are:')
-            print(f'\tLine 1: {line1}')
-            print(f'\tLine 2: {line2}')
-            print(f'\tLine 3: {line3}')
-            total_nums = 0
-            test = re.split('\.|*', line1)
-            print(test)
+            all_nums = {} # key: coords of the start. value: num
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    if i == 0 and j == 0:
+                        continue
+                    ret = find_nums(grid[col+i], occ+j) #str and index
