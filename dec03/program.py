@@ -86,10 +86,6 @@ if __name__ == '__main__':
 
     sum = 0
 
-    # for line in grid:
-    #     thing = ''.join(line)
-    #     print(line)
-
     for col, line in enumerate(grid):
         # Find if there is a star in the line
         occs = [i for i, letter in enumerate(line) if letter == '*']
@@ -100,15 +96,10 @@ if __name__ == '__main__':
                 for j in range(-1, 2):
                     if i == 0 and j == 0:
                         continue
-                    # print(f'finding nums of line {grid[col+i]} at index {occ+j} in row num {col+i}')
-                    ret = find_nums(grid[col+i], occ+j, col+i) #str and index
-                    # print(f'returned {ret[0]} and {ret[1]}')
+                    ret = find_nums(grid[col+i], occ+j, col+i)
                     if ret[0] == (-1,-1) or ret[0] in all_nums:
                         continue
                     all_nums[ret[0]] = ret[1]
-            # Found all numbers, check length of ret
-            # print(f'for index {col, occ}, all nums is ')
-            # print(all_nums)
             if len(all_nums) != 2:
                 continue
             product = 1
