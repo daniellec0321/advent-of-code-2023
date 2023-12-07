@@ -21,8 +21,17 @@ def get_digits(line: str) -> dict: # Key: index in the line, value: the number
 
     return ret
 
-def find_nums(line: str, index: int) -> list: # given a line and index, returns the index of where that number starts and the number
-    return [(-1,-1), '']
+def find_nums(line: str, index: int, row_num: int) -> list: # given a line and index, returns the index of where that number starts and the number
+    if not line[index].isdigit():
+        return [(-1,-1), '']
+    fixed_line = line.replace('*', '.')
+    it = index
+    while it > 0 and fixed_line[it].isdigit():
+        it -= 1
+    it += 1
+    # print(f'found it to be {it}')
+    num = fixed_line[it:].split('.')[0]
+    return [(row_num, it), int(num)]
 
 
 
@@ -91,4 +100,12 @@ if __name__ == '__main__':
                 for j in range(-1, 2):
                     if i == 0 and j == 0:
                         continue
-                    ret = find_nums(grid[col+i], occ+j) #str and index
+                    # print(f'finding nums of line {grid[col+i]} at index {occ+j} in row num {col+i}')
+                    ret = find_nums(grid[col+i], occ+j, col+i) #str and index
+                    # print(f'returned {ret[0]} and {ret[1]}')
+                    if ret[0] == (-1,-1) or ret[0] in all_nums:
+                        continue
+                    all_nums[ret[0]] = ret[1]
+            # Found all numbers, check length of ret
+            print(f'for index {col, occ}, all nums is ')
+            print(all_nums)
