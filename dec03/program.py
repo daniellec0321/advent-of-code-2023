@@ -56,3 +56,40 @@ if __name__ == '__main__':
 
     f.close()
     print(f'The answer to question 1 is {sum}')
+    
+    # Puzzle 2
+    f = open('test.txt', 'r')
+
+    # Making the puzzle grid (also making a buffer)
+    grid = [x.strip() for x in f.readlines()]
+    grid = [''.join('.' for _ in grid[0])] + grid + [''.join('.' for _ in grid[0])]
+    grid = ['.' + line + '.' for line in grid]
+    # Clear all symbols on the grid if not '*' or a digit
+    for row, line in enumerate(grid):
+        grid[row] = list(line)
+        for col, elem in enumerate(line):
+            if (not elem.isdigit()) and (elem != '*'):
+                grid[row][col] = '.'
+        grid[row] = ''.join(grid[row])
+
+    sum = 0
+
+    for line in grid:
+        thing = ''.join(line)
+        print(line)
+
+    for col, line in enumerate(grid):
+        # Find if there is a star in the line
+        occs = [i for i, letter in enumerate(line) if letter == '*']
+        for occ in occs:
+            # Check to make sure there are exactly two numbers
+            line1 = grid[col-1][occ-1:occ+2]
+            line2 = grid[col][occ-1:occ+2]
+            line3 = grid[col+1][occ-1:occ+2]
+            print(f'for * at index ({col}, {occ}), the lines are:')
+            print(f'\tLine 1: {line1}')
+            print(f'\tLine 2: {line2}')
+            print(f'\tLine 3: {line3}')
+            total_nums = 0
+            test = re.split('\.|*', line1)
+            print(test)
