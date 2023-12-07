@@ -70,7 +70,7 @@ if __name__ == '__main__':
     print(f'The answer to question 1 is {sum}')
     
     # Puzzle 2
-    f = open('test.txt', 'r')
+    f = open('input.txt', 'r')
 
     # Making the puzzle grid (also making a buffer)
     grid = [x.strip() for x in f.readlines()]
@@ -86,9 +86,9 @@ if __name__ == '__main__':
 
     sum = 0
 
-    for line in grid:
-        thing = ''.join(line)
-        print(line)
+    # for line in grid:
+    #     thing = ''.join(line)
+    #     print(line)
 
     for col, line in enumerate(grid):
         # Find if there is a star in the line
@@ -107,5 +107,14 @@ if __name__ == '__main__':
                         continue
                     all_nums[ret[0]] = ret[1]
             # Found all numbers, check length of ret
-            print(f'for index {col, occ}, all nums is ')
-            print(all_nums)
+            # print(f'for index {col, occ}, all nums is ')
+            # print(all_nums)
+            if len(all_nums) != 2:
+                continue
+            product = 1
+            for num in all_nums.values():
+                product *= num
+            sum += product
+
+    f.close()
+    print(f'The answer to puzzle two is {sum}')
