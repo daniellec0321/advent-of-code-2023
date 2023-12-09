@@ -27,44 +27,79 @@ def puzzle2():
     lines = [x.rstrip() for x in list(filter(lambda l: l != '\n', sys.stdin.readlines()))]
     seed_vals = list(map(int, list(filter(lambda l: l != '', \
             lines[0].rstrip().split(':')[1].rstrip().split(' ')))))
-    seeds = set()
-    updated = dict()
+    seeds = list()
     for i in range(0, len(seed_vals), 2):
-        seeds.add((seed_vals[i], seed_vals[i+1]))
-    new_seeds = set()
+        seeds.append((seed_vals[i], seed_vals[i+1]))
+    range_changes = list()
     for line in lines[1:]:
         # print(f'at line {line}')
         if '-' in line:
-            seeds.update(new_seeds)
-            new_seeds = set()
-            continue
-        dst_start = int(line.split(' ')[0])
-        src_start = int(line.split(' ')[1])
-        range_amount = int(line.split(' ')[2])
-        src_end = src_start + range_amount
-        copy = seeds.copy()
-        # for seed in seeds:
-        #     if 1:
-        #     # if (src_start <= seed <= src_end) and (not updated[(seed)]):
+            if len(range_changes) == 0:
+                continue
+            new_seeds = list()
+
+            while seeds:
+                seed_start, seed_range = seeds.pop()
+                # go through rangechanges
+                no_change = True
+                for dst_start, src_start, code_range in range_changes:
+                    if (src_start <= seed_start < src_start+code_range): # seed starts after source OR is completely within range
+                        affected_range = (seed_start, seed_range)
+                        if (seed_start + seed_range) > (src_start + code_range):
+                            # write unaffected
+                            unaffected = (src_start+code_range, (seed_start+seed_range) - (src_start+code_range))
+                            seeds.append(unaffected)
+                            # write affected
+                            affected_range = (seed_start, (src_start+code_range)-seed_start)
+                        # translate affected
+                        affected = (affected_range[0]+(dst_start-src_start), affected_range[1])
+                        new_seeds.append(affected)
+                        no_change = False 
+                        break
+                    elif src_start < seed_start+seed_range: # seed ends within the range and start outside the range
+                        # default options
+                        unaffected = (seed_start, (src_start-seed_start))
+                        seeds.append(unaffected)
+                        no_change = False
+                        break
+                if no_change:
+                    new_seeds.append((seed_start, seed_range))
+
+            seeds = new_seeds.copy()
+            range_changes = list()
+        else:
+            # add on the range change
+            range_changes.append(tuple(list(map(int, line.split(' ')))))
+    
+    # Compute last set of range changes
+    if len(range_changes) != 0:
+        new_seeds = set()
+        print('Range changes is:')
+        print(range_changes)
+        seeds = new_seeds.copy()
+        range_changes = set()
+
+        # dst_start = int(line.split(' ')[0])
+        # src_start = int(line.split(' ')[1])
+        # range_amount = int(line.split(' ')[2])
+        # src_end = src_start + range_amount
+        # copy = list(seeds)
+        # while copy:
+        #     # seeds.remove(seed)
+        #     # new_seeds.add(seed)
+        #     seed_start = seed[0]
+        #     seed_end = seed[0] + seed[1]
+        #     if (src_start <= seed_start < src_end):
+        #         print(f'for line {line} and seed {seed}, need to update')
+        #         seeds.remove(seed)
+        #         # Split range into two tuples
+        #         # If the entire seed is affected
+        #         affected = (seed_start, seed_end)
+        #         if seed_end > src_end:
+        #             affected = (69, 69)
+        #             # unaffected equals something that we need to put into seeds
+        #     elif (src_start < seed_end <= src_end):
         #         pass
-        #     else:
-        #        new_seeds.add(seed)
-        for seed in copy:
-            # seeds.remove(seed)
-            # new_seeds.add(seed)
-            seed_start = seed[0]
-            seed_end = seed[0] + seed[1]
-            if (src_start <= seed_start < src_end):
-                print(f'for line {line} and seed {seed}, need to update')
-                seeds.remove(seed)
-                # Split range into two tuples
-                # If the entire seed is affected
-                affected = (seed_start, seed_end)
-                if seed_end > src_end:
-                    affected = (69, 69)
-                    # unaffected equals something that we need to put into seeds
-            elif (src_start < seed_end <= src_end):
-                pass
 
     # print(f'The answer to puzzle 2 is {min(seeds)}')
 
