@@ -37,47 +37,85 @@ def puzzle2():
             if len(range_changes) == 0:
                 continue
             new_seeds = list()
-
-            while seeds:
-                seed_start, seed_range = seeds.pop()
-                # go through rangechanges
-                no_change = True
-                for dst_start, src_start, code_range in range_changes:
+            for dst_start, src_start, code_range in range_changes:
+                seeds_copy = list()
+                for seed_start, seed_range in seeds:
+                    # if unaffected, push to copy
+                    # if affected, push to newseeds
                     if (src_start <= seed_start < src_start+code_range): # seed starts after source OR is completely within range
                         affected_range = (seed_start, seed_range)
                         if (seed_start + seed_range) > (src_start + code_range):
                             # write unaffected
                             unaffected = (src_start+code_range, (seed_start+seed_range) - (src_start+code_range))
-                            seeds.append(unaffected)
+                            seeds_copy.append(unaffected)
                             # write affected
                             affected_range = (seed_start, (src_start+code_range)-seed_start)
                         # translate affected
                         affected = (affected_range[0]+(dst_start-src_start), affected_range[1])
                         new_seeds.append(affected)
-                        no_change = False 
-                        break
                     elif src_start < seed_start+seed_range: # seed ends within the range and start outside the range
                         # default options
                         unaffected = (seed_start, (src_start-seed_start))
-                        seeds.append(unaffected)
-                        no_change = False
-                        break
-                if no_change:
-                    new_seeds.append((seed_start, seed_range))
-
-            seeds = new_seeds.copy()
+                        seeds_copy.append(unaffected)
+                        affected_range = (src_start, seed_range-(src_start-seed_start))
+                        # edge case: encoding is completely wrapped in seed
+                        if (src_start+code_range) < (seed_start+seed_range):
+                            unaffected = (src_start+code_range, (seed_start+seed_range)-(src_start+code_range))
+                            seeds_copy.append(unaffected)
+                            affected_range = (src_start, affected_range[1]-unaffected[1])
+                        # translate affected
+                        affected = (affected_range[0]+(dst_start-src_start), affected_range[1])
+                        new_seeds.append(affected)
+                    else:
+                        seeds_copy.append((seed_start, seed_range))
+                seeds = seeds_copy.copy()
+            seeds += new_seeds
             range_changes = list()
+        
         else:
             # add on the range change
             range_changes.append(tuple(list(map(int, line.split(' ')))))
+
+    #         while seeds:
+    #             seed_start, seed_range = seeds.pop()
+    #             # go through rangechanges
+    #             no_change = True
+    #             for dst_start, src_start, code_range in range_changes:
+    #                 if (src_start <= seed_start < src_start+code_range): # seed starts after source OR is completely within range
+    #                     affected_range = (seed_start, seed_range)
+    #                     if (seed_start + seed_range) > (src_start + code_range):
+    #                         # write unaffected
+    #                         unaffected = (src_start+code_range, (seed_start+seed_range) - (src_start+code_range))
+    #                         seeds.append(unaffected)
+    #                         # write affected
+    #                         affected_range = (seed_start, (src_start+code_range)-seed_start)
+    #                     # translate affected
+    #                     affected = (affected_range[0]+(dst_start-src_start), affected_range[1])
+    #                     new_seeds.append(affected)
+    #                     no_change = False 
+    #                     break
+    #                 elif src_start < seed_start+seed_range: # seed ends within the range and start outside the range
+    #                     # default options
+    #                     unaffected = (seed_start, (src_start-seed_start))
+    #                     seeds.append(unaffected)
+    #                     no_change = False
+    #                     break
+    #             if no_change:
+    #                 new_seeds.append((seed_start, seed_range))
+
+    #         seeds = new_seeds.copy()
+    #         range_changes = list()
+    #     else:
+    #         # add on the range change
+    #         range_changes.append(tuple(list(map(int, line.split(' ')))))
     
-    # Compute last set of range changes
-    if len(range_changes) != 0:
-        new_seeds = set()
-        print('Range changes is:')
-        print(range_changes)
-        seeds = new_seeds.copy()
-        range_changes = set()
+    # # Compute last set of range changes
+    # if len(range_changes) != 0:
+    #     new_seeds = set()
+    #     print('Range changes is:')
+    #     print(range_changes)
+    #     seeds = new_seeds.copy()
+    #     range_changes = set()
 
         # dst_start = int(line.split(' ')[0])
         # src_start = int(line.split(' ')[1])
@@ -101,7 +139,8 @@ def puzzle2():
         #     elif (src_start < seed_end <= src_end):
         #         pass
 
-    # print(f'The answer to puzzle 2 is {min(seeds)}')
+    print(f'The seeds are {seeds}')
+    print(f'The answer to puzzle 2 is {min(seeds)}')
 
 
 
