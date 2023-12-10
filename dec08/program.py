@@ -1,7 +1,25 @@
 import sys
 
 def puzzle1():
-    pass
+    directions = list(sys.stdin.readline().rstrip())
+    graph = dict() # Key: string representing location. Value: tuple of its left and right
+    for line in [x.rstrip() for x in sys.stdin.readlines() if x != '\n']:
+        location = line.split('=')[0].strip()
+        left = line.split('=')[1].split('(')[1].split(',')[0].strip()
+        right = line.split('=')[1].split('(')[1].split(',')[1].split(')')[0].strip()
+        graph[location] = (left, right)
+    current_location = 'AAA'
+    num_moves = 0
+    while current_location != 'ZZZ':
+        for turn in directions:
+            if current_location == 'ZZZ':
+                break
+            if turn == 'L':
+                current_location = graph[current_location][0]
+            else:
+                current_location = graph[current_location][1]
+            num_moves += 1
+    print(f'The answer to puzzle 1 is {num_moves}')
 
 
 
