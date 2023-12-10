@@ -19,7 +19,17 @@ def puzzle1():
 
 
 def puzzle2():
-    pass
+    time = int(''.join(list(filter(lambda l: l != '', \
+            sys.stdin.readline().rstrip().split(':')[1].rstrip().split(' ')))))
+    best_distance = int(''.join(list(filter(lambda l: l != '', \
+            sys.stdin.readline().rstrip().split(':')[1].rstrip().split(' ')))))
+    ways_to_win = 0
+    for button_hold in range(1, time):
+        time_left = time-button_hold
+        distance_traveled = time_left*button_hold
+        if (distance_traveled > best_distance):
+            ways_to_win += 1
+    print(f'The answer to puzzle 2 is {ways_to_win}')
 
 
 
