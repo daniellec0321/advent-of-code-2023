@@ -1,5 +1,6 @@
 import sys
 from math import lcm
+from itertools import product
 
 def puzzle1():
     directions = list(sys.stdin.readline().rstrip())
@@ -24,7 +25,8 @@ def puzzle1():
 
 
 
-def puzzle2():
+def puzzle2():     
+
     directions = list(sys.stdin.readline().rstrip())
     graph = dict() # Key: string representing location. Value: tuple of its left and right
     a_nodes = list()
@@ -41,40 +43,34 @@ def puzzle2():
 
     possible_moves = dict()
     for start_location in a_nodes:
-        print(f'testing {start_location}')
-        moves = list()
+        moves = set()
         for end_location in z_nodes:
-            print(f'testing end location {end_location}')
             current_location = start_location
             num_moves = 0
+            dp = set()
+            break_outer = False
             while current_location != end_location:
-                for turn in directions:
+                for turn_idx, turn in enumerate(directions):
+                    # Add current location to dp
                     if current_location == end_location:
+                        break_outer = True
                         break
+                    if (turn_idx, current_location) in dp:
+                        num_moves = -1
+                        break_outer = True
+                        break
+                    dp.add((turn_idx, current_location))
                     if turn == 'L':
                         current_location = graph[current_location][0]
                     else:
                         current_location = graph[current_location][1]
                     num_moves += 1
-            # print(f'The answer to puzzle 1 is {num_moves}')
-            moves.append(num_moves)
+                if break_outer:
+                    break
+            if num_moves != -1:
+                moves.add(num_moves)
         possible_moves[start_location] = moves
-    print(possible_moves)
-    
-    # current_locations = a_nodes.copy()
-    # num_moves = 0
-    # while not all(loc in z_nodes for loc in current_locations):
-    #     for turn in directions:
-    #         if all(loc in z_nodes for loc in current_locations):
-    #             break
-    #         if turn == 'L':
-    #             for idx, loc in enumerate(current_locations):
-    #                 current_locations[idx] = graph[loc][0]
-    #         else:
-    #             for idx, loc in enumerate(current_locations):
-    #                 current_locations[idx] = graph[loc][1]
-    #         num_moves += 1
-    # print(f'The answer to puzzle 2 is {num_moves}')
+    # print(possible_moves)
 
 
 
