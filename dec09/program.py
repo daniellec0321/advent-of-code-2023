@@ -32,7 +32,7 @@ def puzzle2():
     ans = 0
     for line in [list(map(int, x.strip().split(' '))) for x in sys.stdin.readlines()]:
         ans += helper(line)
-    print(f'The answer to puzzle 1 is {ans}')
+    print(f'The answer to puzzle 2 is {ans}')
 
 
 
