@@ -26,21 +26,25 @@ def puzzle1():
                     break
         return (s1, s2)
 
-    def find_spot(start_index: tuple, came_from: tuple) -> tuple:
-        moves = {'north': (-1,0,), 'east': (0,1), 'south': (1,0), 'west': (0,-1)}
-        for move, coord in moves.items():
-            spot = tuple(np.add(start_index, coord))
-            # Check that coord is in grid
-            if (spot == came_from) or (spot[0] < 0) or (spot[1] < 0) or (spot[0] >= len(grid)) or (spot[1] >= len(grid[0])):
-                continue
-            # Check if this is a valid connection
-            symbol = grid[spot[0]][spot[1]]
-            if (move == 'north' and ((symbol == '|') or (symbol == '7') or (symbol == 'F'))) or \
-                (move == 'east' and ((symbol == '-') or (symbol == '7') or (symbol == 'J'))) or \
-                (move == 'south' and ((symbol == '|') or (symbol == 'J') or (symbol == 'L'))) or \
-                (move == 'west' and ((symbol == '-') or (symbol == 'L') or (symbol == 'F'))):
-                return spot
-            return (-1, -1)
+    def find_spot(curr_index: tuple, came_from: tuple) -> tuple:
+        symbol = grid[curr_index[0]][curr_index[1]]
+        moves = []
+        if symbol == '-':
+            moves = [tuple(np.add(curr_index, (0,-1)))] + [tuple(np.add(curr_index, (0,1)))]
+        elif symbol == '|':
+            moves = [tuple(np.add(curr_index, (-1,0)))] + [tuple(np.add(curr_index, (1,0)))]
+        elif symbol == 'L':
+            moves = [tuple(np.add(curr_index, (-1,0)))] + [tuple(np.add(curr_index, (0,1)))]
+        elif symbol == 'J':
+            moves = [tuple(np.add(curr_index, (-1,0)))] + [tuple(np.add(curr_index, (0,-1)))]
+        elif symbol == '7':
+            moves = [tuple(np.add(curr_index, (1,0)))] + [tuple(np.add(curr_index, (0,-1)))]
+        elif symbol == 'F':
+            moves = [tuple(np.add(curr_index, (1,0)))] + [tuple(np.add(curr_index, (0,1)))]
+        for move in moves:
+            if move != came_from:
+                return move
+        return (-1, -1)
 
     # Read in grid
     grid = [line.strip() for line in sys.stdin.readlines()]
@@ -53,18 +57,18 @@ def puzzle1():
     # Initialize spots
     s1, s2 = find_initial_spots(start_index)
     total_moves = 1
-    s1_visited = {s1}
-    s2_visited = {s2}
     s1_came_from = start_index
     s2_came_from = start_index
-    while len(set.intersection(s1_visited, s2_visited)) == 0:
-        # print(s1, s2)
-        # s1, s2 = find_spots(start_index)
-        s1 = find_spot()
-        s1_visited.add(s1)
-        s2_visited.add(s2)
+    while s1 != s2:
+        s1_new = find_spot(s1, s1_came_from)
+        s2_new = find_spot(s2, s2_came_from)
+        s1_came_from = s1
+        s2_came_from = s2
+        s1 = s1_new
+        s2 = s2_new
         total_moves += 1
-    print(total_moves)
+    
+    print(f'The answer to puzzle 1 is {total_moves}')
 
 
 
