@@ -76,6 +76,7 @@ def puzzle2():
     
     # helper function that finds a spot
     def find_initial_spots(start_index: tuple) -> tuple:
+        s_symbols = {'|', '-', 'F', 'J', 'L', '7'}
         s1 = start_index
         s2 = start_index
         moves = {'north': (-1,0,), 'east': (0,1), 'south': (1,0), 'west': (0,-1)}
@@ -90,12 +91,44 @@ def puzzle2():
                 (move == 'east' and ((symbol == '-') or (symbol == '7') or (symbol == 'J'))) or \
                 (move == 'south' and ((symbol == '|') or (symbol == 'J') or (symbol == 'L'))) or \
                 (move == 'west' and ((symbol == '-') or (symbol == 'L') or (symbol == 'F'))):
+                # Set s symbol
+                # if move == 'east' or move == 'west':
+                #     s_symbols.discard('|')
+                # if move == 'north' or move == 'south':
+                #     s_symbols.discard('-')
+                # if move == 'east' or move == 'south':
+                #     s_symbols.discard('F')
+                # if move == 'north' or move == 'west':
+                #     s_symbols.discard('J')
+                # if move == 'north' or move == 'east':
+                #     s_symbols.discard('L')
+                # if move == 'south' or move == 'west':
+                #     s_symbols.discard('7')
+                if move == 'north':
+                    s_symbols.discard('-')
+                    s_symbols.discard('7')
+                    s_symbols.discard('F')
+                elif move == 'south':
+                    s_symbols.discard('-')
+                    s_symbols.discard('J')
+                    s_symbols.discard('L')
+                elif move == 'east':
+                    s_symbols.discard('|')
+                    s_symbols.discard('J')
+                    s_symbols.discard('7')
+                else:
+                    s_symbols.discard('|')
+                    s_symbols.discard('F')
+                    s_symbols.discard('L')
                 if s1 == start_index:
                     s1 = spot
                 else:
                     s2 = spot
                     break
-        return (s1, s2)
+        if len(s_symbols) != 1:
+            print('what da hell')
+            exit()
+        return (s1, s2, list(s_symbols)[0])
 
     def find_spot(curr_index: tuple, came_from: tuple) -> tuple:
         symbol = grid[curr_index[0]][curr_index[1]]
@@ -129,8 +162,8 @@ def puzzle2():
                 route[(row,idx)] = 'r'
             else:
                 route[(row,idx)] = 'n'
-    # Initialize spots
-    s1, s2 = find_initial_spots(start_index)
+    # Initialize spots (testing for the start of s)
+    s1, s2, s_symbol = find_initial_spots(start_index)
     route[s1] = 'r'
     route[s2] = 'r'
     s1_came_from = start_index
@@ -144,13 +177,30 @@ def puzzle2():
         s2 = s2_new
         route[s1] = 'r'
         route[s2] = 'r'
-    # Now that route is found, go around route again and find the inside
-    curr_spot = start_index
-    curr_spot, s2 = find_initial_spots(start_index)
-    while curr_spot != start_index:
-        break
+    # Convert start symbol
+    grid[start_index[0]] = list(grid[start_index[0]])
+    grid[start_index[0]][start_index[1]] = s_symbol
+    grid[start_index[0]] = ''.join(grid[start_index[0]])
+    # Now that route is found, loop through grid to find inside
+    inside_count = 0
+    inside_flag = False
+    last_wall = '|'
+    for row, line in enumerate(grid):
+        last_wall = '|'
+        inside_flag = False
+        for col, symbol in enumerate(line):
+            if route[(row,col)] == 'r' and (symbol == '|' or \
+                (symbol == '7' and last_wall == 'L') or \
+                (symbol == 'J' and last_wall == 'F')):
+                inside_flag = not inside_flag
+                last_wall = symbol
+            elif route[(row,col)] == 'r' and \
+                (symbol == '7' or symbol == 'J' or symbol == 'L' or symbol == 'F'):
+                last_wall = symbol
+            elif inside_flag and route[(row,col)] != 'r':
+                inside_count += 1
 
-    print(f'The answer to puzzle 2 is uh')
+    print(f'The answer to puzzle 2 is {inside_count}')
 
 
 
