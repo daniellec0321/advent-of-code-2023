@@ -4,16 +4,21 @@ def puzzle1():
     old_grid = [list(line.strip()) for line in sys.stdin.readlines()]
     grid = []
     for line in old_grid:
-        grid.append(line)
+        grid.append(line.copy())
         if '#' not in line:
-            grid.append(line)
+            grid.append(line.copy())
     cols_to_add = [col_idx for col_idx in range(len(grid[0])) if '#' not in [line[col_idx] for line in grid]]
     for adder, idx in enumerate(cols_to_add):
-        for row in range(len(grid)):
-            print(f'Inserting period at row {row} index {idx+adder}')
-            grid[row].insert(idx+adder, '.')
-    for line in grid:
-        print(line)
+        for line in grid:
+            line.insert(idx+adder, '.')
+    # Loop through sets and find the distances
+    galaxies = [(row,col) for row, line in enumerate(grid) for col, symbol in enumerate(line) if symbol == '#']
+    total_distance = 0
+    while galaxies:
+        curr = galaxies.pop()
+        for galaxy in galaxies:
+            total_distance += (abs(curr[0]-galaxy[0]) + abs(curr[1]-galaxy[1]))
+    print(f'The answer to puzzle 1 is {total_distance}')
 
 
 
