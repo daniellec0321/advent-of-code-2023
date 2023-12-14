@@ -23,7 +23,32 @@ def puzzle1():
 
 
 def puzzle2():
-    pass
+    grid = [list(line.strip()) for line in sys.stdin.readlines()]
+    galaxies = [(row,col) for row, line in enumerate(grid) for col, symbol in enumerate(line) if symbol == '#']
+    moved_positions = dict()
+    for row, col in galaxies:
+        moved_positions[(row,col)] = (row,col)
+    # Find empty rows
+    for row, line in enumerate(grid):
+        if '#' not in line:
+            for r, c in moved_positions.keys():
+                if r > row:
+                    moved_positions[(r,c)] = (moved_positions[(r,c)][0]+999999, moved_positions[(r,c)][1])
+    # Find empty columns
+    cols = [[row[i] for row in grid] for i in range(len(grid[0]))]
+    for col, line in enumerate(cols):
+        if '#' not in line:
+            for r, c in moved_positions.keys():
+                if c > col:
+                    moved_positions[(r,c)] = (moved_positions[(r,c)][0], moved_positions[(r,c)][1]+999999)
+    # Loop through sets and find the distances
+    galaxies_to_find = list(moved_positions.values())
+    total_distance = 0
+    while galaxies_to_find:
+        curr = galaxies_to_find.pop()
+        for galaxy in galaxies_to_find:
+            total_distance += (abs(curr[0]-galaxy[0]) + abs(curr[1]-galaxy[1]))
+    print(f'The answer to puzzle 2 is {total_distance}')
 
 
 
