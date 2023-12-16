@@ -107,9 +107,12 @@ class Puzzle2():
 
     def solve_puzzle(self):
         counts = 0
+        counter = 1
         for l, c in [(x.strip().split(' ')[0], \
          list(map(int, x.strip().split(' ')[1].split(',')))) \
          for x in sys.stdin.readlines()]:
+            print(f'On line {counter}')
+            counter += 1
 
             line = ''
             contigs = list()
