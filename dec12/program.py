@@ -37,12 +37,19 @@ class Puzzle2():
         if not (groups and contigs):
             return 0
         
+        # Base case: one contig left
+        if len(contigs) == 1:
+            line = '#' * contigs[0]
+            for group in groups:
+                pass
+
+        
         counts = 0
         # Loop through each possible starting position
-        for start_pos in range(0, len(groups[0])-(contigs[0]-1)):
+        for start_pos in range(0, len(groups[0])-contigs[0]):
             end_pos = start_pos + contigs[0]
-            # print(f'Contig is {contig}, line is {groups[0]}')
-            # print(f'Start pos is {start_pos}, end pos is {end_pos}')
+            print(f'Contig is {contigs[0]}, line is {groups[0]}')
+            print(f'Start pos is {start_pos}, end pos is {end_pos}')
             # Check that beginning and end are ? not #
             if len(groups[0]) > 1:
                 if start_pos > 0 and groups[0][start_pos-1] == '#':
@@ -52,7 +59,7 @@ class Puzzle2():
             # If valid, then recurse
             # check if we can break up the line
             new_groups = groups.copy()[1:]
-            if end_pos < len(groups[0]) - 2:
+            if end_pos < len(groups[0]) - 1:
                 print('hiiiiiiiii')
                 add_this = groups[0][end_pos:]
                 new_groups.insert(0, add_this)
