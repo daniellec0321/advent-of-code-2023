@@ -1,7 +1,33 @@
 import sys
+from itertools import combinations
 
 def puzzle1():
-    pass
+
+    counts = 0
+    for line, contig in [(x.strip().split(' ')[0], \
+     list(map(int, x.strip().split(' ')[1].split(',')))) \
+     for x in sys.stdin.readlines()]:
+        
+        unknowns = [i for i, ch in enumerate(line) if ch == '?']
+        to_find = sum(contig) - len([i for i, ch in enumerate(line) if ch == '#'])
+        for combo in combinations(unknowns, to_find):
+            test = list(line)
+            for idx in combo:
+                test[idx] = '#'
+            test = (''.join(test)).replace('?', '.')
+            # Verify test
+            groups = list(filter(lambda l: (l != '') and (l != '.'), test.split('.')))
+            if len(groups) != len(contig):
+                continue
+            valid = True
+            for idx, g in enumerate(groups):
+                if len(g) != contig[idx]:
+                    valid = False
+                    break
+            if valid:
+                counts += 1
+
+    print(f'The answer to puzzle 1 is {counts}')
 
 
 
