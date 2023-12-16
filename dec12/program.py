@@ -34,6 +34,7 @@ def puzzle1():
 class Puzzle2():
 
     def helper(self, groups: list[str], contigs: list[int]) -> int:
+        # print(f'Recursing on groups: {groups}, contigs: {contigs}')
         if not (groups and contigs):
             return 0
 
@@ -44,11 +45,13 @@ class Puzzle2():
                 if '#' in group and not found:
                     found = True
                 elif '#' in group and found:
+                    # print(f'group: {group}, contig: {contigs[0]} - invalid')
                     return 0
             if not found:
                 counts = 0
                 for group in groups:
                     counts += (len(group)-contigs[0]+1)
+                # print(f'group: {group}, contig: {contigs[0]} - valid!')
                 return counts
             # Otherwise, find group that has the pound
             group = list(filter(lambda l: '#' in l, groups))[0]
@@ -59,41 +62,44 @@ class Puzzle2():
                 end_pos = start_pos + contig
                 if len(group) > 1:
                     if start_pos > 0 and group[start_pos-1] == '#':
+                        # print(f'group: {group}, contig: {contig}, startpos {start_pos} - invalid')
                         continue
                     if end_pos < len(group) and group[end_pos] == '#':
+                        # print(f'group: {group}, contig: {contig}, startpos {start_pos} - invalid')
                         continue
+                # print(f'group: {group}, contig: {contig}, startpos {start_pos} - valid!')
                 counts += 1
             return counts
         
         counts = 0
-        group = groups[0]
-        contig = contigs[0]
-        # Loop through each possible starting position
-        # for start_pos in range(0, len(groups[0])-contigs[0]):
-        for start_pos in range(0, len(group)-contig+1):
-            # end_pos = start_pos + contigs[0]
-            end_pos = start_pos + contig
-            # print(f'Contig is {contigs[0]}, line is {groups[0]}')
-            # print(f'Start pos is {start_pos}, end pos is {end_pos}')
-            # Check that beginning and end are ? not #
-            # if len(groups[0]) > 1:
-            if len(group) > 1:
-                # if start_pos > 0 and groups[0][start_pos-1] == '#':
-                if start_pos > 0 and group[start_pos-1] == '#':
-                    continue
-                # if end_pos < len(groups[0]) and groups[0][end_pos] == '#':
-                if end_pos < len(group) and group[end_pos] == '#':
-                    continue
-            # If valid, then recurse
-            # check if we can break up the line
-            new_groups = groups.copy()[1:]
-            # if end_pos < len(groups[0]) - 1:
-            if end_pos < len(group) - 1:
-                #print('hiiiiiiiii')
-                # add_this = groups[0][end_pos:]
-                add_this = group[end_pos:]
-                new_groups.insert(0, add_this)
-            counts += self.helper(new_groups, contigs[1:])
+        for group_idx, group in enumerate(groups):
+            # group = groups[0]
+            contig = contigs[0]
+            pos = sys.maxsize if (''.join(group)).find('#') == -1 else (''.join(group)).find('#')+1
+            # Loop through each possible starting position
+            for start_pos in range(0, min(len(group)-contig+1, pos)):
+                # print(f'group: {group}, contig: {contig}, startpos: {start_pos}')
+                end_pos = start_pos + contig
+                if len(group) > 1:
+                    if start_pos > 0 and group[start_pos-1] == '#':
+                        # print('Start pos makes  it invalid')
+                        continue
+                    if end_pos < len(group) and group[end_pos] == '#':
+                        # print('end pos makes it invalid')
+                        continue
+                # print('Its valid!')
+                # If valid, then recurse
+                # check if we can break up the line
+                # new_groups = groups.copy()[1:]
+                new_groups = groups.copy()[group_idx+1:]
+                if end_pos < len(group) - 1:
+                    add_this = group[end_pos+1:]
+                    new_groups.insert(0, add_this)
+                thing = self.helper(new_groups, contigs[1:])
+                # print(f'Recursion returned {thing}')
+                counts += thing
+            if '#' in group:
+                break
         
         return counts
 
@@ -104,6 +110,7 @@ class Puzzle2():
         for l, c in [(x.strip().split(' ')[0], \
          list(map(int, x.strip().split(' ')[1].split(',')))) \
          for x in sys.stdin.readlines()]:
+
             line = ''
             contigs = list()
             for _ in range(4):
@@ -111,16 +118,16 @@ class Puzzle2():
                 contigs += c
             contigs += c
             line += l
+
+            # line = l.strip()
+            # contigs = c.copy()
+
             # Split line by periods
             groups = list(filter(lambda l: l != '', line.split('.')))
-            groups = ['#??#', '###']
-            contigs = [2, 1, 3]
-            counts += self.helper(groups, contigs)
-            # print(line)
-            # print(groups)
-            # print(contigs)
-
-            break
+            # print(groups, contigs)
+            test = self.helper(groups, contigs)
+            # print(f'answer to this line is {test}')
+            counts += test
 
         print(f'The answer to puzzle 2 is {counts}')
 
