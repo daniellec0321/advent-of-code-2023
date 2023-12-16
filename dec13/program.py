@@ -21,16 +21,16 @@ def puzzle1():
             if valid_reflection:
                 valid_split = split
                 break
-        if valid_split > 0:
+        if valid_split >= 0:
             ans += (valid_split+1)*100
             continue
         
-        grid =[[row[i] for row in grid] for i in range(len(grid[0]))]
+        new_grid =[[row[i] for row in grid] for i in range(len(grid[0]))]
         valid_split = -1
-        for split in range(0, len(grid)-1):
-            r1 = grid[:split+1]
+        for split in range(0, len(new_grid)-1):
+            r1 = new_grid[:split+1]
             r1.reverse()
-            r2 = grid[split+1:]
+            r2 = new_grid[split+1:]
             # Check each row
             to_check = min(len(r1), len(r2))
             valid_reflection = True
@@ -41,7 +41,7 @@ def puzzle1():
             if valid_reflection:
                 valid_split = split
                 break
-        if valid_split > 0:
+        if valid_split >= 0:
             ans += (valid_split+1)
 
     print(f'The answer to puzzle 1 is {ans}')
