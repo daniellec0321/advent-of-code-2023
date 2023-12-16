@@ -34,19 +34,32 @@ def puzzle1():
 class Puzzle2():
 
     def helper(self, groups: list[str], contigs: list[int]) -> int:
-        if not groups and not contigs:
-            return 1
-        if (not groups and contigs) or (groups and not contigs):
+        if not (groups and contigs):
             return 0
         
-        # Just testing the first element in groups before recursing
-        contigs_that_fit = 0 # refers to how many elements of config can fit in this
-        for contig in contigs:
-            if contig <= len(groups[0]):
-                contigs_that_fit += 1
+        counts = 0
+        # Loop through each possible starting position
+        for start_pos in range(0, len(groups[0])-(contigs[0]-1)):
+            end_pos = start_pos + contigs[0]
+            # print(f'Contig is {contig}, line is {groups[0]}')
+            # print(f'Start pos is {start_pos}, end pos is {end_pos}')
+            # Check that beginning and end are ? not #
+            if len(groups[0]) > 1:
+                if start_pos > 0 and groups[0][start_pos-1] == '#':
+                    continue
+                if end_pos < len(groups[0]) and groups[0][end_pos] == '#':
+                    continue
+            # If valid, then recurse
+            # check if we can break up the line
+            new_groups = groups.copy()[1:]
+            if end_pos < len(groups[0]) - 2:
+                print('hiiiiiiiii')
+                add_this = groups[0][end_pos:]
+                new_groups.insert(0, add_this)
+            counts += self.helper(new_groups, contigs[1:])
+        
+        return counts
 
-        # Loop through each configuration
-        return 69
 
 
     def solve_puzzle(self):
@@ -63,9 +76,12 @@ class Puzzle2():
             line += l
             # Split line by periods
             groups = list(filter(lambda l: l != '', line.split('.')))
-            print(line)
-            print(groups)
-            print(contigs)
+            groups = ['#??#', '###']
+            contigs = [2, 1, 3]
+            counts += self.helper(groups, contigs)
+            # print(line)
+            # print(groups)
+            # print(contigs)
 
             break
 
