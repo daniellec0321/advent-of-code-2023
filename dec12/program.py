@@ -31,8 +31,45 @@ def puzzle1():
 
 
 
-def puzzle2():
-    pass
+class Puzzle2():
+
+    def helper(self, groups: list[str], contigs: list[int]) -> int:
+        if not groups and not contigs:
+            return 1
+        if (not groups and contigs) or (groups and not contigs):
+            return 0
+        
+        # Just testing the first element in groups before recursing
+        contigs_that_fit = 0 # refers to how many elements of config can fit in this
+        for contig in contigs:
+            if contig <= len(groups[0]):
+                contigs_that_fit += 1
+
+        # Loop through each configuration
+        return 69
+
+
+    def solve_puzzle(self):
+        counts = 0
+        for l, c in [(x.strip().split(' ')[0], \
+         list(map(int, x.strip().split(' ')[1].split(',')))) \
+         for x in sys.stdin.readlines()]:
+            line = ''
+            contigs = list()
+            for _ in range(4):
+                line += (l + '?')
+                contigs += c
+            contigs += c
+            line += l
+            # Split line by periods
+            groups = list(filter(lambda l: l != '', line.split('.')))
+            print(line)
+            print(groups)
+            print(contigs)
+
+            break
+
+        print(f'The answer to puzzle 2 is {counts}')
 
 
 
@@ -45,4 +82,5 @@ if __name__ == '__main__':
     if sys.argv[1] == '1':
         puzzle1()
     elif sys.argv[1] == '2':
-        puzzle2()
+        SOL = Puzzle2()
+        SOL.solve_puzzle()
