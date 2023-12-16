@@ -1,12 +1,14 @@
 import sys
 
-def puzzle1():
-    pass
+class Puzzle1():
+    def solve_puzzle(self, stream=sys.stdin):
+        pass
 
 
 
-def puzzle2():
-    pass
+class Puzzle2():
+    def solve_puzzle(self, stream=sys.stdin):
+        pass
 
 
 
@@ -17,6 +19,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if sys.argv[1] == '1':
-        puzzle1()
+        SOL = Puzzle1()
     elif sys.argv[1] == '2':
-        puzzle2()
+        SOL = Puzzle2()
+
+    SOL.solve_puzzle()
