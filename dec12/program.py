@@ -36,47 +36,62 @@ class Puzzle2():
     def helper(self, groups: list[str], contigs: list[int]) -> int:
         if not (groups and contigs):
             return 0
-        
-        # Testing
-        groups = ['???', '??']
-        contigs = [3]
 
         # Base case: one contig left
         if len(contigs) == 1:
-            counts = 0
+            found = False
             for group in groups:
-                if len(group) < contigs[0]:
-                    continue
-                for start_pos in range(0, len(group)-contigs[0]+1):
-                    end_pos = start_pos + contigs[0]
-                    # Check that beginning and end are ? not #
-                    if len(group) > 1:
-                        if start_pos > 0 and group[start_pos-1] == '#':
-                            continue
-                        elif end_pos < len(group) and group[end_pos] == '#':
-                            continue
-                    counts += 1
+                if '#' in group and not found:
+                    found = True
+                elif '#' in group and found:
+                    return 0
+            if not found:
+                counts = 0
+                for group in groups:
+                    counts += (len(group)-contigs[0]+1)
+                return counts
+            # Otherwise, find group that has the pound
+            group = list(filter(lambda l: '#' in l, groups))[0]
+            contig = contigs[0]
+            counts = 0
+            pos = (''.join(group)).find('#')
+            for start_pos in range(0, min(len(group)-contig+1, pos+1)):
+                end_pos = start_pos + contig
+                if len(group) > 1:
+                    if start_pos > 0 and group[start_pos-1] == '#':
+                        continue
+                    if end_pos < len(group) and group[end_pos] == '#':
+                        continue
+                counts += 1
             return counts
-
         
         counts = 0
+        group = groups[0]
+        contig = contigs[0]
         # Loop through each possible starting position
-        for start_pos in range(0, len(groups[0])-contigs[0]):
-            end_pos = start_pos + contigs[0]
-            print(f'Contig is {contigs[0]}, line is {groups[0]}')
-            print(f'Start pos is {start_pos}, end pos is {end_pos}')
+        # for start_pos in range(0, len(groups[0])-contigs[0]):
+        for start_pos in range(0, len(group)-contig+1):
+            # end_pos = start_pos + contigs[0]
+            end_pos = start_pos + contig
+            # print(f'Contig is {contigs[0]}, line is {groups[0]}')
+            # print(f'Start pos is {start_pos}, end pos is {end_pos}')
             # Check that beginning and end are ? not #
-            if len(groups[0]) > 1:
-                if start_pos > 0 and groups[0][start_pos-1] == '#':
+            # if len(groups[0]) > 1:
+            if len(group) > 1:
+                # if start_pos > 0 and groups[0][start_pos-1] == '#':
+                if start_pos > 0 and group[start_pos-1] == '#':
                     continue
-                if end_pos < len(groups[0]) and groups[0][end_pos] == '#':
+                # if end_pos < len(groups[0]) and groups[0][end_pos] == '#':
+                if end_pos < len(group) and group[end_pos] == '#':
                     continue
             # If valid, then recurse
             # check if we can break up the line
             new_groups = groups.copy()[1:]
-            if end_pos < len(groups[0]) - 1:
-                print('hiiiiiiiii')
-                add_this = groups[0][end_pos:]
+            # if end_pos < len(groups[0]) - 1:
+            if end_pos < len(group) - 1:
+                #print('hiiiiiiiii')
+                # add_this = groups[0][end_pos:]
+                add_this = group[end_pos:]
                 new_groups.insert(0, add_this)
             counts += self.helper(new_groups, contigs[1:])
         
