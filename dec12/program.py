@@ -37,11 +37,26 @@ class Puzzle2():
         if not (groups and contigs):
             return 0
         
+        # Testing
+        groups = ['???', '??']
+        contigs = [3]
+
         # Base case: one contig left
         if len(contigs) == 1:
-            line = '#' * contigs[0]
+            counts = 0
             for group in groups:
-                pass
+                if len(group) < contigs[0]:
+                    continue
+                for start_pos in range(0, len(group)-contigs[0]+1):
+                    end_pos = start_pos + contigs[0]
+                    # Check that beginning and end are ? not #
+                    if len(group) > 1:
+                        if start_pos > 0 and group[start_pos-1] == '#':
+                            continue
+                        elif end_pos < len(group) and group[end_pos] == '#':
+                            continue
+                    counts += 1
+            return counts
 
         
         counts = 0
