@@ -1,8 +1,17 @@
 import sys
 
 class Puzzle1():
+
     def solve_puzzle(self, stream=sys.stdin):
-        pass
+        sum = 0
+        for elem in sys.stdin.readline().strip().split(','):
+            current_value = 0
+            for char in elem:
+                current_value += ord(char)
+                current_value *= 17
+                current_value %= 256
+            sum += current_value
+        print(f'The answer to puzzle 1 is {sum}')
 
 
 
