@@ -79,10 +79,47 @@ class Puzzle2():
 
     def solve_puzzle(self, stream=sys.stdin):
         grid = [list(x.strip()) for x in stream]
-
+        layouts = dict() # Key: tuple that represents the grid. Value: it's index
+        cycles = dict() # Same thing but swapped to help with indexing
+        to_enter = [tuple(row) for row in grid]
+        layouts[tuple(to_enter)] = 0
+        cycles[0] = tuple(to_enter)
         
+        found_cycle = -1
+        cycle_end = -1
+        r = grid.copy()
+        for i in range(1, 1000000001):
+            # rotate grid
+            r = self.roll_north(r)
+            r = self.roll_west(r)
+            r = self.roll_south(r)
+            r = self.roll_east(r)
+            # check if this is in grid
+            elem = tuple([tuple(row) for row in r])
+            if elem in layouts:
+                # set stuff
+                found_cycle = layouts[elem]
+                cycle_end = i
+                break
+            # add elem to layouts
+            layouts[elem] = i
+            cycles[i] = elem
 
         total_weight = 0
+        if found_cycle >= 0:
+            # find where in the cycle the final rotation is
+            cycles_left = 1000000000 - found_cycle
+            # for this one, 7 rotations
+            the_end = found_cycle + (cycles_left % (cycle_end - found_cycle))
+            # set r equal to this end value
+            r = [list(l) for l in cycles[the_end]]
+            
+        # take r and find weight from there
+        for idx, line in enumerate(r):
+            num_rocks = Counter(line)['O']
+            factor = len(r) - idx
+            total_weight += (num_rocks * factor)
+        
         print(f'The answer to puzzle 2 is {total_weight}')
 
 
