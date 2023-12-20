@@ -11,6 +11,7 @@ class Puzzle1():
         self.direction_move = {'L': (0,-1), 'R': (0,1), 'U': (-1,0), 'D': (1,0)}
 
     def multt(self, t: tuple[int, int], n: int) -> tuple[int, int]:
+        ret = (t[0]*n, t[1]*n)
         return (t[0]*n, t[1]*n)
     
     def addt(self, a: tuple[int, int], b: tuple[int, int]) -> tuple[int, int]:
@@ -21,29 +22,67 @@ class Puzzle1():
         # Create the grid
         grid = list()
         start_spot = (0,0)
-        dir, to_move, _ = stream.readline().split(' ')
-        if dir == 'L' or dir == 'R':
+        start_dir, to_move, _ = stream.readline().split(' ')
+        if start_dir == 'L' or start_dir == 'R':
             grid = [['-'] * (int(to_move)+1)]
         else:
             grid = [['|']] * (int(to_move)+1)
-        if dir == 'R':
+        if start_dir == 'R':
             start_spot = (0, int(to_move))
-        elif dir == 'D':
+        elif start_dir == 'D':
             start_spot = (int(to_move), 0)
-        print(grid)
 
         # Read through grid
         curr_spot = start_spot
-        curr_dir = dir
+        curr_dir = start_dir
         for dir, a, _ in [x.strip().split(' ') for x in stream.readlines()]:
-            to_move = int(a)
-
             # Write the direction change
-            print(curr_spot)
+            to_move = int(a)
             grid[curr_spot[0]][curr_spot[1]] = self.direction_change[(curr_dir, dir)]
 
             # Check where the ending spot will be
             end_spot = self.addt(curr_spot, self.multt(self.direction_move[dir], to_move))
+            x, y = end_spot
+
+            if (x < 0):
+                row_to_add = ['.'] * len(grid[0])
+                for _ in range(abs(x)):
+                    grid.insert(0, row_to_add.copy())
+
+            if (x >= len(grid)):
+                row_to_add = ['.'] * len(grid[0])
+                for _ in range(x - len(grid) + 1):
+                    grid.append(row_to_add.copy())
+
+            # Check if y is in bounds
+            if (y < 0):
+                # Transpose grid then insert
+                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+                row_to_add = ['.'] * len(grid[0])
+                for _ in range(abs(x)):
+                    grid.insert(0, row_to_add.copy())
+                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+
+            if (y >= len(grid[0])):
+                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+                row_to_add = ['.'] * len(grid[0])
+                for _ in range(x - len(grid) + 1):
+                    grid.append(row_to_add.copy())
+                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+
+            # Mark those spots on the grid
+            curr_spot = self.addt(curr_spot, self.direction_move[dir])
+            while curr_spot != end_spot:
+                grid[curr_spot[0]][curr_spot[1]] = self.direction_symbol[dir]
+                curr_spot = self.addt(curr_spot, self.direction_move[dir])
+
+            # Update values
+            curr_dir = dir
+
+        # Add the last end spot (use start dir and curr dir)
+        grid[curr_spot[0]][curr_spot[1]] = self.direction_change[(curr_dir, start_dir)]
+
+        # Read through grid again, counting up the insides
 
 
 
