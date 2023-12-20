@@ -33,11 +33,13 @@ class Puzzle1():
             start_spot = (int(to_move), 0)
 
         # Read through grid
+        total_lava = 0
         curr_spot = start_spot
         curr_dir = start_dir
         for dir, a, _ in [x.strip().split(' ') for x in stream.readlines()]:
             # Write the direction change
             to_move = int(a)
+            total_lava += to_move
             grid[curr_spot[0]][curr_spot[1]] = self.direction_change[(curr_dir, dir)]
 
             # Check where the ending spot will be
@@ -83,6 +85,19 @@ class Puzzle1():
         grid[curr_spot[0]][curr_spot[1]] = self.direction_change[(curr_dir, start_dir)]
 
         # Read through grid again, counting up the insides
+        last_wall = '|'
+        inside = False
+        for line in grid:
+            for char in line:
+                if char == '|' or ((char == '7' and last_wall == 'L') or (char == 'J' and last_wall == 'F')):
+                    inside = not inside
+                    last_wall = '|'
+                elif char == '7' or char == 'L' or char == 'F' or char == 'J':
+                    last_wall = char
+                elif char == '.' and inside:
+                    total_lava += 1
+
+        print(f'The answer to puzzle 1 is {total_lava}')
 
 
 
