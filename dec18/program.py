@@ -156,6 +156,33 @@ class Puzzle2():
         for key, value in self.columns.items():
             self.columns[key] = sorted(value)
 
+        # Sort the row keys
+        sorted_row_keys = sorted(self.rows.keys())
+        sorted_column_keys = sorted(self.columns.keys())
+
+        total_lava = 0
+        # Process up and left, keep out right and bottom (unless at the end)
+        for idx, row in enumerate(sorted_row_keys):
+            # Find earliest column whose direction changes includes that row
+            col1 = None
+            col2 = None
+            for col in sorted_column_keys:
+                # Check all of its direction changes
+                for i in range(len(self.columns[col])-1):
+                    curr1 = self.columns[col][i][0]
+                    curr2 = self.columns[col][i+1][0]
+                    if (curr1 <= row <= curr2):
+                        print('found something')
+                        print(f'row: {row}, col: {col}, curr1: {curr1}, curr2: {curr2}\n')
+                        if col1 == None:
+                            col1 = col
+                        elif col2 == None:
+                            col2 = col
+                            break
+                if (col1 != None) and (col2 != None):
+                    break
+            print(f'For row {row}, found {col1} and {col2}')
+            
 
 
 if __name__ == '__main__':
