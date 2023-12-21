@@ -110,8 +110,8 @@ class Puzzle2():
                                  ('0', '3'): 'J', ('0', '1'): '7', \
                                  ('3', '2'): '7', ('3', '0'): 'F', \
                                  ('1', '2'): 'J', ('1', '0'): 'L'}
-        self.lines = dict() # Key: The row. Value: a dictionary
-                            # Key: The column. Value: the direction symbol
+        self.rows = dict() # Key: The row. Value: a list of tuples (column, symbol)
+        self.columns = dict() # Key: The column. Value: a list of tuples (row, symbol)
         
     def multt(self, t: tuple[int, int], n: int) -> tuple[int, int]:
         return (t[0]*n, t[1]*n)
@@ -122,8 +122,6 @@ class Puzzle2():
     def solve_puzzle(self, stream=sys.stdin):
         # First, read through all the instructions to find the total size of the grid.
         curr_spot = (0, 0)
-        # top_left = (0, 0)
-        # bottom_right = (0, 0)
         prev_dir = '0'
         first_dir = ''
         for symbol in [x.split(' ')[2].strip()[2:-1] for x in stream.readlines()]:
@@ -132,28 +130,31 @@ class Puzzle2():
 
             # Can update curr spot's direction change
             x, y = curr_spot
-            if x not in self.lines:
-                self.lines[x] = dict()
+            if x not in self.rows:
+                self.rows[x] = list()
+            if y not in self.columns:
+                self.columns[y] = list()
             if first_dir:
-                self.lines[x][y] = self.direction_change[(prev_dir, dir)]
+                self.rows[x].append((y, self.direction_change[(prev_dir, dir)]))
+                self.columns[y].append((x, self.direction_change[(prev_dir, dir)]))
             else:
                 first_dir = dir
 
             # Update all of the values
             curr_spot = self.addt(curr_spot, self.multt(self.direction_move[dir], to_move))
             prev_dir = dir
-
-            # if curr_spot[0] <= top_left[0] and curr_spot[1] <= top_left[1]:
-            #     top_left = curr_spot
-            # if curr_spot[0] >= bottom_right[0] and curr_spot[1] >= bottom_right[1]:
-            #     bottom_right = curr_spot
-            
-        # grid_size = self.addt(bottom_right, self.multt(top_left, -1))
         
         # Update the first spot
-        if 0 not in self.lines:
-            self.lines[0] = dict()
-        self.lines[0][0] = self.direction_change[(dir, first_dir)]
+        if 0 not in self.rows:
+            self.rows[0] = list()
+        if 0 not in self.columns:
+            self.columns[0] = list()
+        self.rows[0].append((0, self.direction_change[(dir, first_dir)]))
+        self.columns[0].append((0, self.direction_change[(dir, first_dir)]))
+        for key, value in self.rows.items():
+            self.rows[key] = sorted(value)
+        for key, value in self.columns.items():
+            self.columns[key] = sorted(value)
 
 
 
