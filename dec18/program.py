@@ -33,7 +33,7 @@ class Puzzle1():
             start_spot = (int(to_move), 0)
 
         # Read through grid
-        total_lava = 0
+        total_lava = int(to_move)
         curr_spot = start_spot
         curr_dir = start_dir
         for dir, a, _ in [x.strip().split(' ') for x in stream.readlines()]:
@@ -47,9 +47,12 @@ class Puzzle1():
             x, y = end_spot
 
             if (x < 0):
+                # END SPOT AND CURR SPOT MOVES!!!!
                 row_to_add = ['.'] * len(grid[0])
                 for _ in range(abs(x)):
                     grid.insert(0, row_to_add.copy())
+                end_spot = (0, end_spot[1])
+                curr_spot = (curr_spot[0]+abs(x), curr_spot[1])
 
             if (x >= len(grid)):
                 row_to_add = ['.'] * len(grid[0])
@@ -58,19 +61,16 @@ class Puzzle1():
 
             # Check if y is in bounds
             if (y < 0):
-                # Transpose grid then insert
-                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
-                row_to_add = ['.'] * len(grid[0])
-                for _ in range(abs(x)):
-                    grid.insert(0, row_to_add.copy())
-                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+                for line in grid:
+                    for _ in range(abs(y)):
+                        line.insert(0, '.')
+                end_spot = (end_spot[0], 0)
+                curr_spot = (curr_spot[0], curr_spot[1]+abs(y))
 
             if (y >= len(grid[0])):
-                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
-                row_to_add = ['.'] * len(grid[0])
-                for _ in range(x - len(grid) + 1):
-                    grid.append(row_to_add.copy())
-                grid = [[row[i] for row in grid] for i in range(len(grid[0]))]
+                for line in grid:
+                    for _ in range(abs(y)):
+                        line.append('.')
 
             # Mark those spots on the grid
             curr_spot = self.addt(curr_spot, self.direction_move[dir])
