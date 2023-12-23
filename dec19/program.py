@@ -43,8 +43,30 @@ class Puzzle1():
 
 
 class Puzzle2():
+
     def solve_puzzle(self, stream=sys.stdin):
-        pass
+        bad_values = {'x': set(), 'm': set(), 'a': set(), 's': set()}
+
+        # Find all the rules that end in rejection
+        # Find path by going from R -> in
+        rules = dict() # Key: the label. Value: a function that returns where to go
+        while (line := stream.readline().strip()):
+            label = line.split('{')[0]
+            curr_rules = line.split('{')[1][:-1].split(',')
+            rules[label] = curr_rules
+            
+        start_points = [(label, idx) for label, vals in rules.items() for idx, val in enumerate(vals) if val[-1] == 'R']
+
+        # Dynamic programming
+        labels_checked = set()
+
+        # for label, idx in start_points:
+        #     # Check if label in labels checked
+        #     if label in labels_checked:
+        #         continue
+        #     # Check all of the rules up to that idx
+        #     rules_to_check = rules[label][:idx+1]
+        #     for rule in rules_to_check:
 
 
 
