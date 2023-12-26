@@ -74,6 +74,8 @@ class Puzzle2():
                 if '<' in condition:
                     var, num = condition.split('<')
                     num = int(num)
+                    for i in range(0, num):
+                        curr_good_values[var].discard(i)
                     for i in range(num, 4001):
                         curr_good_values[var].add(i)
                 else:
@@ -81,6 +83,8 @@ class Puzzle2():
                     num = int(num)
                     for i in range(0, num+1):
                         curr_good_values[var].add(i)
+                    for i in range(num+1, 4001):
+                        curr_good_values[var].discard(i)
 
             # Check last value
             if idx != len(rules[label])-1:
@@ -90,9 +94,13 @@ class Puzzle2():
                     num = int(num)
                     for i in range(0, num):
                         curr_good_values[var].add(i)
+                    for i in range(num, 4001):
+                        curr_good_values[var].discard(i)
                 else:
                     var, num = condition.split('>')
                     num = int(num)
+                    for i in range(0, num+1):
+                        curr_good_values[var].discard(i)
                     for i in range(num+1, 4001):
                         curr_good_values[var].add(i)
 
@@ -113,6 +121,8 @@ class Puzzle2():
                 start_points.put((l, label, idx, curr_good_values.copy()))
 
         print(f'The answer to puzzle 2 is {total_good}')
+        print(f'diff is {pow(4000, 4) - total_good}')
+        print(f'other diff is {167409079868000 - total_good}')
 
 
 
