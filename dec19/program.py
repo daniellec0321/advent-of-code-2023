@@ -46,10 +46,8 @@ class Puzzle1():
 class Puzzle2():
 
     def solve_puzzle(self, stream=sys.stdin):
-        bad_values = {'x': set(), 'm': set(), 'a': set(), 's': set()}
+        good_values = {'x': set(), 'm': set(), 'a': set(), 's': set()}
 
-        # Find all the rules that end in rejection
-        # Find path by going from R -> in
         rules = dict() # Key: the label. Value: the list of rules
         presence = dict() # Key: the label. Value: the set of tuples of (label, idx) where this label is present
         while (line := stream.readline().strip()):
@@ -62,66 +60,55 @@ class Puzzle2():
                     presence[dest] = set()
                 presence[dest].add((label, idx))
 
-        # start_points = [(label, idx, bad_values.copy()) for label, vals in rules.items() for idx, val in enumerate(vals) if val[-1] == 'R']
-        # start_points = [(label, bad_values.copy()) for label in presence['R']]
         start_points = Queue()
-        for label, idx in presence['R']:
-            start_points.put((label, 'R', idx, bad_values.copy()))
+        for label, idx in presence['A']:
+            start_points.put((label, 'A', idx, good_values.copy()))
 
-        total_bad = 0
+        total_good = 0
         while not start_points.empty():
-            # curr_label, curr_idx, curr_bad_values = start_points.pop()
             # Check if the label is "in"
-            label, dest, idx, curr_bad_values = start_points.get()
-            print(f'looking at label {label} with dest {dest}, idx {idx}')
-            # Look through the label and find the conditions that get to the dest
-        #     perform_nots = True if rules[label][-1] == dest else False
-        #     print('The rules are:')
-        #     for rule in rules[label]:
-        #         print(rule)
-        #     for rule in rules[label][:-1]:
-        #         condition, res = rule.split(':')
-        #         if perform_nots and res != dest:
-        #             if '<' in condition:
-        #                 var, num = condition.split('<')
-        #                 num = int(num)
-        #                 print(f'For rule {rule}, adding values to var {var} from {num} to {4000}')
-        #                 for i in range(num, 4001):
-        #                     curr_bad_values[var].add(i)
-        #             else:
-        #                 var, num = condition.split('>')
-        #                 num = int(num)
-        #                 print(f'For rule {rule}, adding values to var {var} from {0} to {num}')
-        #                 for i in range(0, num+1):
-        #                     curr_bad_values[var].add(i)
-        #         elif res == dest:
-        #             if '<' in condition:
-        #                 var, num = condition.split('<')
-        #                 num = int(num)
-        #                 print(f'For rule {rule}, adding values to var {var} from {0} to {num-1}')
-        #                 for i in range(0, num):
-        #                     curr_bad_values[var].add(i)
-        #             else:
-        #                 var, num = condition.split('>')
-        #                 num = int(num)
-        #                 print(f'For rule {rule}, adding values to var {var} from {num+1} to {4000}')
-        #                 for i in range(num+1, 4001):
-        #                     curr_bad_values[var].add(i)
-        #     # If label is 'in', add to the global thing and stop
-        #     if label == 'in':
-        #         total = 1
-        #         for var in curr_bad_values:
-        #             total *= len(curr_bad_values[var])
-        #         total_bad += total
-        #         continue
-        #     # Add the labels and bad values to the queue
-        #     for l in presence[label]:
-        #         start_points.put((l, label, curr_bad_values.copy()))
-        #     print('--------------------')
-        
-        # # Find the number of good values
-        # good_values = pow(4000, 4) - total_bad
-        # print(f'The answer to puzzle 2 is {good_values}')
+            label, dest, idx, curr_good_values = start_points.get()
+
+            for rule in rules[label][:idx]:
+                condition, res = rule.split(':')
+                if '<' in condition:
+                    var, num = condition.split('<')
+                    num = int(num)
+                    for i in range(num, 4001):
+                        curr_good_values[var].add(i)
+                else:
+                    var, num = condition.split('>')
+                    num = int(num)
+                    for i in range(0, num+1):
+                        curr_good_values[var].add(i)
+
+            # Check last value
+            if idx != len(rules[label])-1:
+                condition = rules[label][idx].split(':')[0]
+                if '<' in condition:
+                    var, num = condition.split('<')
+                    num = int(num)
+                    for i in range(0, num):
+                        curr_good_values[var].add(i)
+                else:
+                    var, num = condition.split('>')
+                    num = int(num)
+                    for i in range(num+1, 4001):
+                        curr_good_values[var].add(i)
+
+            # Check if the label is 'in', which means we're at the end
+            if label == 'in':
+                total = 1
+                for var in curr_good_values:
+                    total *= len(curr_good_values[var])
+                total_good += total
+                continue # tally up stuff and add to total good
+
+            # Add to the queue
+            for l, idx in presence[label]:
+                start_points.put((l, label, idx, curr_good_values.copy()))
+
+        print(f'The answer to puzzle 2 is {total_good}')
 
 
 
