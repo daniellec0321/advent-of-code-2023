@@ -99,8 +99,12 @@ class Puzzle2():
             # Check if the label is 'in', which means we're at the end
             if label == 'in':
                 total = 1
+                to_add = dict()
                 for var in curr_good_values:
-                    total *= len(curr_good_values[var])
+                    to_add[var] = curr_good_values[var] - good_values[var]
+                    print(f'len of total is {len(good_values[var])}, len of curr is {len(curr_good_values[var])}, len of to add is {len(to_add[var])}')
+                    total *= len(to_add[var])
+                    good_values[var] = good_values[var] | curr_good_values[var]
                 total_good += total
                 continue # tally up stuff and add to total good
 
