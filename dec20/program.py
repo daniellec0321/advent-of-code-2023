@@ -1,4 +1,5 @@
 import sys
+from queue import Queue
 
 class Puzzle1():
 
@@ -25,11 +26,18 @@ class Puzzle1():
                 return 'low'
             return 'high'
         
+    class broadcaster():
+        def __init__(self):
+            self.outputs = list()
+        
     def is_flipflop(self, obj):
         return isinstance(obj, Puzzle1.flipflop)
     
     def is_conjunction(self, obj):
         return isinstance(obj, Puzzle1.conjunction)
+    
+    def is_broadcaster(self, obj):
+        return isinstance(obj, Puzzle1.broadcaster)
 
     def solve_puzzle(self, stream=sys.stdin):
         
@@ -38,7 +46,6 @@ class Puzzle1():
         for line in stream.readlines():
             source = line.split(' -> ')[0]
             outputs = [x.strip() for x in line.split(' -> ')[1].split(', ')]
-            print(f'source: {source}, outputs: {outputs}')
             if source[0] == '%':
                 new_obj = self.flipflop()
                 new_obj.outputs = outputs
@@ -48,8 +55,38 @@ class Puzzle1():
                 new_obj.outputs = outputs
                 vars[source[1:]] = new_obj
             else:
-                new_obj = 'broadcaster'
+                new_obj = self.broadcaster()
+                new_obj.outputs = outputs
                 vars[source] = new_obj
+
+        # Set up the inputs of all of the conjunctions
+        for label, var in vars.items():
+            for op in var.outputs:
+                if op in vars and self.is_conjunction(vars[op]):
+                    vars[op].inputs[label] = 'low'
+
+        # Set up states
+        states = dict() # Key: tuple, value: cycle num
+        init_state = list()
+        for label, var in vars.items():
+            if self.is_conjunction(var):
+                for s in var.inputs.values():
+                    init_state.append(s)
+            elif self.is_flipflop(var):
+                init_state.append(var.state)
+        states[tuple(init_state)] = 0
+
+        # Loop through pressing the button 1000 times
+        for i in range(1000):
+            # Update states
+            # Queue will be a list of tuples (module, pulse)
+            q = Queue()
+            for op in vars['broadcaster'].outputs:
+                q.put((op, 'low'))
+            while not q.empty():
+                curr_label, curr_pulse = q.get()
+                
+            # Check if that has been encountered already
 
 
 class Puzzle2():
