@@ -110,7 +110,7 @@ class Puzzle2():
                 to_add = dict()
                 for var in curr_good_values:
                     to_add[var] = curr_good_values[var] - good_values[var]
-                    print(f'len of total is {len(good_values[var])}, len of curr is {len(curr_good_values[var])}, len of to add is {len(to_add[var])}')
+                    # print(f'len of total is {len(good_values[var])}, len of curr is {len(curr_good_values[var])}, len of to add is {len(to_add[var])}')
                     total *= len(to_add[var])
                     good_values[var] = good_values[var] | curr_good_values[var]
                 total_good += total
