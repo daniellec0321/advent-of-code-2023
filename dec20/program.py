@@ -7,7 +7,7 @@ class Puzzle1():
         def __init__(self):
             self.state = 'off'
             self.outputs = list()
-        def rec_pulse(self, pulse: str) -> str:
+        def rec_pulse(self, pulse: str, inp=None) -> str:
             if pulse == 'low' and self.state == 'off':
                 self.state = 'on'
                 return 'high'
@@ -67,6 +67,8 @@ class Puzzle1():
 
         # Set up states
         states = dict() # Key: tuple, value: cycle num
+        high_pulses = dict()
+        low_pulses = dict()
         init_state = list()
         for label, var in vars.items():
             if self.is_conjunction(var):
@@ -75,18 +77,59 @@ class Puzzle1():
             elif self.is_flipflop(var):
                 init_state.append(var.state)
         states[tuple(init_state)] = 0
+        high_pulses[0] = 0
+        low_pulses[0] = 0
 
         # Loop through pressing the button 1000 times
-        for i in range(1000):
+        # for i in range(1, 1001):
+        for i in range(1):
             # Update states
             # Queue will be a list of tuples (module, pulse)
+            curr_high_pulses = 0
+            curr_low_pulses = 1
             q = Queue()
             for op in vars['broadcaster'].outputs:
-                q.put((op, 'low'))
+                q.put((op, 'low', 'broadcaster'))
+                curr_low_pulses += 1
             while not q.empty():
-                curr_label, curr_pulse = q.get()
+                # Curr label is receiving the curr pulse
+                curr_label, curr_pulse, pulse_from = q.get()
+                print(f'curr_label: {curr_label}, currpulse: {curr_pulse}, pulsefrom: {pulse_from}')
+                out_pulse = vars[curr_label].rec_pulse(curr_pulse, pulse_from)
+                # Add this stuff to the queue
+                if out_pulse:
+                    for op in vars[curr_label].outputs:
+                        q.put((op, out_pulse, curr_label))
+                        if out_pulse == 'low':
+                            curr_low_pulses += 1
+                        else:
+                            curr_high_pulses += 1
                 
+            # Create state by looping through vars
+            curr_state = list()
+            for label, var in vars.items():
+                if self.is_conjunction(var):
+                    for s in var.inputs.values():
+                        curr_state.append(s)
+                elif self.is_flipflop(var):
+                    curr_state.append(var.state)
             # Check if that has been encountered already
+            curr_state = tuple(curr_state)
+            if curr_state in states:
+                # add up everything and break
+                start_cycle = states[curr_state]
+                total_high_pulses = 0
+                total_low_pulses = 0
+                for j in range(start_cycle, i):
+                    total_high_pulses += high_pulses[j]
+                    total_low_pulses += low_pulses[j]
+                # Calculate beginning leftover
+                for j in range(0, start_cycle):
+                    total_high_pulses += high_pulses[j]
+                    total_low_pulses += low_pulses[j]
+                # Calculate ending leftover
+            else:
+                states[curr_state] = i
 
 
 class Puzzle2():
