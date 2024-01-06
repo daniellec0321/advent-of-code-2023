@@ -84,7 +84,7 @@ class Puzzle1():
         # Loop through pressing the button 1000 times
         for i in range(0, 1000):
             # Update states
-            # Queue will be a list of tuples (module, pulse)
+            # Queue will be a list of tuples (module, pulse, source)
             curr_high_pulses = 0
             curr_low_pulses = 1
             q = Queue()
@@ -119,14 +119,18 @@ class Puzzle1():
             # Check if that has been encountered already
             curr_state = tuple(curr_state)
 
-            states[curr_state] = i
-            high_pulses[i] += curr_high_pulses
-            low_pulses[i] += curr_low_pulses
+            # states[curr_state] = i
+            # high_pulses[i] += curr_high_pulses
+            # low_pulses[i] += curr_low_pulses
 
             if curr_state in states:
                 # add up everything and break
+                print(f'found a repeat state at cycle {i}')
                 start_cycle = states[curr_state]
                 break
+            states[curr_state] = i
+            high_pulses[i] = curr_high_pulses
+            low_pulses[i] = curr_low_pulses
                 # total_high_pulses = 0
                 # total_low_pulses = 0
                 # # Calculate middle stuff
