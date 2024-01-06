@@ -3,7 +3,7 @@ from queue import Queue
 
 class Puzzle1():
 
-    def addt(t1: tuple, t2: tuple) -> tuple:
+    def addt(self, t1: tuple, t2: tuple) -> tuple:
         return tuple([sum(x) for x in zip(t1, t2)])
 
     def solve_puzzle(self, stream=sys.stdin):
@@ -18,16 +18,29 @@ class Puzzle1():
         visited = set() # tuples of (x, y, cycle)
         end_spots = set() # tuples of (x, y)
         frontier.put((*start_point, 0))
-        visited.add((*start_point, 0))
 
         moves = [(-1,0), (1,0), (0,-1), (0,1)]
+        x_lim = len(grid)
+        y_lim = len(grid[0])
         
-        while not frontier.empty:
+        while not frontier.empty():
             x, y, curr_cycle = frontier.get()
             if curr_cycle == 64:
                 end_spots.add((x, y))
                 continue
+            if (x, y, curr_cycle) in visited:
+                continue
+            visited.add((x, y, curr_cycle))
             # Add on possible spots to queue
+            togo = [self.addt((x,y), m) for m in moves]
+            togo = [elem for elem in togo if (0 <= elem[0] < x_lim) and \
+                    (0 <= elem[1] < y_lim) and grid[elem[0]][elem[1]] != '#']
+            for m in togo:
+                frontier.put((*m, curr_cycle+1))
+
+        # print(end_spots)
+        print(f'The answer to puzzle 1 is {len(end_spots)}')
+
 
 
 
