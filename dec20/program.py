@@ -82,8 +82,7 @@ class Puzzle1():
         start_cycle = 1000
 
         # Loop through pressing the button 1000 times
-        for i in range(0, 1000):
-            # Update states
+        for i in range(1, 1001):
             # Queue will be a list of tuples (module, pulse, source)
             curr_high_pulses = 0
             curr_low_pulses = 1
@@ -92,12 +91,10 @@ class Puzzle1():
                 q.put((op, 'low', 'broadcaster'))
                 curr_low_pulses += 1
             while not q.empty():
-                # Curr label is receiving the curr pulse
                 curr_label, curr_pulse, pulse_from = q.get()
+                out_pulse = ''
                 if curr_label in vars:
                     out_pulse = vars[curr_label].rec_pulse(curr_pulse, pulse_from)
-                else:
-                    out_pulse = ''
                 # Add this stuff to the queue
                 if out_pulse:
                     for op in vars[curr_label].outputs:
@@ -106,7 +103,6 @@ class Puzzle1():
                             curr_low_pulses += 1
                         else:
                             curr_high_pulses += 1
-            print(f'currlow: {curr_low_pulses}, currhigh: {curr_high_pulses}')
                 
             # Create state by looping through vars
             curr_state = list()
@@ -118,68 +114,29 @@ class Puzzle1():
                     curr_state.append(var.state)
             # Check if that has been encountered already
             curr_state = tuple(curr_state)
-
-            # states[curr_state] = i
-            # high_pulses[i] += curr_high_pulses
-            # low_pulses[i] += curr_low_pulses
+            high_pulses[i] = curr_high_pulses
+            low_pulses[i] = curr_low_pulses
 
             if curr_state in states:
                 # add up everything and break
-                print(f'found a repeat state at cycle {i}')
                 start_cycle = states[curr_state]
                 break
             states[curr_state] = i
-            high_pulses[i] = curr_high_pulses
-            low_pulses[i] = curr_low_pulses
-                # total_high_pulses = 0
-                # total_low_pulses = 0
-                # # Calculate middle stuff
-                # for j in range(start_cycle, i):
-                #     total_high_pulses += high_pulses[j]
-                #     total_low_pulses += low_pulses[j]
-                # total_high_pulses *= int((1000 - i) / (i - start_cycle))
-                # total_low_pulses *= int((1000 - i) / (i - start_cycle))
-                # # Calculate beginning leftover
-                # for j in range(0, start_cycle):
-                #     total_high_pulses += high_pulses[j]
-                #     total_low_pulses += low_pulses[j]
-                # # Calculate ending leftover
-                # for j in range(start_cycle, start_cycle+((1000 - i) % (i - start_cycle))):
-                #     total_high_pulses += high_pulses[j]
-                #     total_low_pulses += low_pulses[j]
-            # else:
-            #     states[curr_state] = i
-            #     total_high_pulses[i] += curr_high_pulses
-            #     total_low_pulses[i] += curr_low_pulses
-
-                # 0 1 2 3 4 5 6 7 8 9 10
-                #     h   s (same as 2)
-                #         2 3 2 3 2 3 2
-                # cycle length = i - startcycle
-                # Beginning leftover = startcycle
-                # num button pushes with cycle = 1000 - i (in this case, 11 - 4 = 7)
-                # to multiply by = nbpwc / cycle length
-                # leftover at the end = nbpwc % cycle length (start from cycle length though)
 
         total_high_pulses = 0
         total_low_pulses = 0
         # Calculate middle stuff
-        i += 1
-        for j in range(start_cycle, i):
+        for j in range(start_cycle+1, i+1):
             total_high_pulses += high_pulses[j]
             total_low_pulses += low_pulses[j]
-        total_high_pulses *= int((1000 - (i-1)) / (i - start_cycle))
-        total_low_pulses *= int((1000 - (i-1)) / (i - start_cycle))
+        if i != start_cycle:
+            total_high_pulses *= int((1000 - start_cycle) / (i - start_cycle))
+            total_low_pulses *= int((1000 - start_cycle) / (i - start_cycle))
         # Calculate beginning leftover
-        for j in range(0, start_cycle):
-            total_high_pulses += high_pulses[j]
-            total_low_pulses += low_pulses[j]
-        # Calculate ending leftover
-        for j in range(start_cycle, start_cycle+((1000 - i) % (i - start_cycle))):
+        for j in range(1, start_cycle+1):
             total_high_pulses += high_pulses[j]
             total_low_pulses += low_pulses[j]
 
-        # print(f'total high pulses: {total_high_pulses}, total low: {total_low_pulses}')
         print(f'The answer to puzzle 1 is {total_high_pulses*total_low_pulses}')
 
 
